@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>City Not Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <h1>Oops!</h1>
-    <p>We couldn't find weather data for "{{ city }}".</p>
-    <p>Reason: {{ error_message }}</p>
+    <div class="card">
+        <h1>Oops! 😕</h1>
+        <p>We couldn't find weather data for "{{ city }}".</p>
+        <p style="opacity: 0.7; margin-top: 8px;">Reason: {{ error_message }}</p>
 
-    <a href="/">Try another city</a>
+        <a href="/">← Try another city</a>
+    </div>
 
 </body>
 </html>

@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Weather App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <h1>Check the Weather</h1>
+    <div class="card">
+        <h1>🌤 Check the Weather</h1>
 
-    <form action="/weather" method="GET">
-        <input type="text" name="city" placeholder="Enter a city name" required>
-        <button type="submit">Get Weather</button>
-    </form>
+        <form action="/weather" method="GET">
+            <input type="text" name="city" placeholder="Enter a city name" required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
 
 </body>
 </html>
