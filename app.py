@@ -1,39 +1,57 @@
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 import requests
 
 load_dotenv()
 
+app = Flask(__name__)
+
 api_key = os.getenv('OPENWEATHER_API_KEY')
 
-city = "Mumbai"
 
-url = "https://api.openweathermap.org/data/2.5/weather"
-params = {
-    "q": city,
-    "appid": api_key,
-    "units": "metric"
-}
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-response = requests.get(url, params=params)
 
-print(response.status_code)
-print(response.json())
-data = response.json()
-city_name = data['name']
-temperature = data['main']['temp']
-feels_like = data['main']['feels_like']
-humidity = data['main']['humidity']
-description = data['weather'][0]['description']
+@app.route('/weather')
+def weather():
+    city = request.args.get('city')
 
-print(f"{city_name}: {temperature}°C (feels like {feels_like}°C), {description}, humidity {humidity}%")
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "q": city,
+        "appid": api_key,
+        "units": "metric"
+    }
 
-sunrise = data['sys']['sunrise']
-print(sunrise)
+    response = requests.get(url, params=params)
+    data = response.json()
 
-from datetime import datetime
+    # Check if the API actually found the city, BEFORE trying to use the data.
+    if response.status_code != 200:
+        error_message = data.get('message', 'City not found. Please try again.')
+        return render_template('error.html', error_message=error_message, city=city)
 
-sunrise = data['sys']['sunrise']
-sunrise_readable = datetime.fromtimestamp(sunrise)
+    city_name = data['name']
+    temperature = data['main']['temp']
+    feels_like = data['main']['feels_like']
+    humidity = data['main']['humidity']
+    description = data['weather'][0]['description']
 
-print(sunrise_readable)
+    sunrise = datetime.fromtimestamp(data['sys']['sunrise']).strftime('%I:%M %p')
+    sunset = datetime.fromtimestamp(data['sys']['sunset']).strftime('%I:%M %p')
+
+    return render_template('weather.html',
+                           city_name=city_name,
+                           temperature=temperature,
+                           feels_like=feels_like,
+                           humidity=humidity,
+                           description=description,
+                           sunrise=sunrise,
+                           sunset=sunset)
+
+if __name__ == '__main__':
+    app.run(debug=True)
